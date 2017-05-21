@@ -14,4 +14,4 @@ You can compile `VisualMutatorGUI.sln` with Visual Studio 2013 or later. For you
    ![save results](https://i.imgur.com/3Zy2Ucy.png)
 4. Start VisualMutatorGUI and load the saved results:
 
-![screenshot](https://i.imgur.com/QL5bbGL.png)
+![screenshot](https://i.imgur.com/m0SFTbs.png)
