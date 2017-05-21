@@ -43,16 +43,16 @@
             this.listBoxMutants.ItemHeight = 11;
             this.listBoxMutants.Location = new System.Drawing.Point(12, 41);
             this.listBoxMutants.Name = "listBoxMutants";
-            this.listBoxMutants.Size = new System.Drawing.Size(1012, 121);
-            this.listBoxMutants.TabIndex = 0;
+            this.listBoxMutants.Size = new System.Drawing.Size(1012, 114);
+            this.listBoxMutants.TabIndex = 2;
             // 
             // buttonLoadXml
             // 
             this.buttonLoadXml.Location = new System.Drawing.Point(12, 12);
             this.buttonLoadXml.Name = "buttonLoadXml";
             this.buttonLoadXml.Size = new System.Drawing.Size(122, 23);
-            this.buttonLoadXml.TabIndex = 1;
-            this.buttonLoadXml.Text = "Load Mutation Results";
+            this.buttonLoadXml.TabIndex = 0;
+            this.buttonLoadXml.Text = "&Load Mutation Results";
             this.buttonLoadXml.UseVisualStyleBackColor = true;
             this.buttonLoadXml.Click += new System.EventHandler(this.buttonLoadXml_Click);
             // 
@@ -67,7 +67,7 @@
             this.richTextCode.Name = "richTextCode";
             this.richTextCode.ReadOnly = true;
             this.richTextCode.Size = new System.Drawing.Size(1012, 387);
-            this.richTextCode.TabIndex = 2;
+            this.richTextCode.TabIndex = 3;
             this.richTextCode.Text = "";
             this.richTextCode.WordWrap = false;
             // 
@@ -77,7 +77,7 @@
             this.linkIcon.Location = new System.Drawing.Point(140, 17);
             this.linkIcon.Name = "linkIcon";
             this.linkIcon.Size = new System.Drawing.Size(77, 13);
-            this.linkIcon.TabIndex = 3;
+            this.linkIcon.TabIndex = 1;
             this.linkIcon.TabStop = true;
             this.linkIcon.Text = "Icon by Icons8";
             this.linkIcon.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkIcon_LinkClicked);
