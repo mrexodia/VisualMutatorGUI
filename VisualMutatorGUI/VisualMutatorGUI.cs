@@ -48,6 +48,12 @@ namespace VisualMutatorGUI
             };
         }
 
+        private bool validMatch(string line, string pattern)
+        {
+            var m = Regex.Match(line, pattern);
+            return m.Success && m.Index == 0;
+        }
+
         private void ListBoxMutants_SelectedIndexChanged(object sender, EventArgs e)
         {
             var mutant = liveMutants[listBoxMutants.SelectedIndex];
@@ -57,9 +63,9 @@ namespace VisualMutatorGUI
                 var line = richTextCode.Lines[i];
                 if (i == 0) //first line, full name for the mutated method
                     richTextCode.HighlightLine(0, Color.LightGray);
-                else if (Regex.Match(line, @" +\d+ +\-").Success) //removed line
+                else if (validMatch(line, @" {0,4}\d+ {7}\-")) //removed line
                     richTextCode.HighlightLine(i, Color.PaleVioletRed);
-                else if (Regex.Match(line, @" +\d+ +\+").Success) //added line
+                else if (validMatch(line, @" {4,8}\d+  \+")) //added line
                     richTextCode.HighlightLine(i, Color.GreenYellow);
                 else //any other line
                     richTextCode.HighlightLine(i, Color.White);
@@ -118,7 +124,10 @@ namespace VisualMutatorGUI
                             mutant.Description = fullName;
                             mutants.Add(mutant.Id, mutant);
                             if (mutant.State == "Live")
-                                liveMutants.Add(mutant);
+                            { 
+                                if (liveMutants.Count(m => m.Id == mutant.Id && m.Description == fullName) == 0)
+                                    liveMutants.Add(mutant);
+                            }
                         }
                         name.RemoveAt(name.Count - 1);
                     }
