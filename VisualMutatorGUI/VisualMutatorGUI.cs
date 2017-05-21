@@ -12,21 +12,60 @@ namespace VisualMutatorGUI
 {
     public partial class VisualMutatorGUI : Form
     {
+        private class MutantInfo
+        {
+            public readonly string Id;
+
+            public MutantInfo(string id)
+            {
+                Id = id;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("{0} ({1})", Id, mutd[Id.Split('#')[0]]);
+            }
+        }
+
         private Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant> mutants;
-        private List<string> liveMutants;
+        private List<MutantInfo> liveMutants;
         private Dictionary<string, string> codeListings;
+        private static Dictionary<string, string> mutd;
 
         public VisualMutatorGUI()
         {
             InitializeComponent();
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             listBoxMutants.SelectedIndexChanged += ListBoxMutants_SelectedIndexChanged;
+
+            mutd = new Dictionary<string, string>
+            {
+                { "DEH", "Method delegated for event handling change" },
+                { "DMC", "Delegated method change" },
+                { "EMM", "Modifier method change" },
+                { "EAM", "Accessor method change" },
+                { "EHC", "Exception handling change" },
+                { "EHR", "Exception handling removal" },
+                { "EXS", "Exception swallowing" },
+                { "ISD", "Base keyword deletion" },
+                { "JID", "Field initialization deletion" },
+                { "JTD", "This keyword deletion" },
+                { "PRV", "Reference assignment with other compatible type" },
+                { "MCI", "Member call from another inherited class" },
+                { "AOR", "Arithmetic operator replacement" },
+                { "SOR", "Shift operator replacement" },
+                { "LCR", "Logical connector replacement" },
+                { "LOR", "Logical operator replacement" },
+                { "ROR", "Relational operator replacement" },
+                { "OODL", "Operator deletion" },
+                { "SSDL", "Statement block deletion" },
+            };
         }
 
         private void ListBoxMutants_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var mutantId = liveMutants[listBoxMutants.SelectedIndex];
-            richTextCode.Text = mutants[mutantId].Description + ":\n" + codeListings[mutantId];
+            var mutant = liveMutants[listBoxMutants.SelectedIndex];
+            richTextCode.Text = mutants[mutant.Id].Description + ":\n" + codeListings[mutant.Id];
             for (var i = 0; i < richTextCode.Lines.Length; i++)
             {
                 var line = richTextCode.Lines[i];
@@ -63,7 +102,7 @@ namespace VisualMutatorGUI
 
             //Load mutants
             mutants = new Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant>();
-            liveMutants = new List<string>();
+            liveMutants = new List<MutantInfo>();
             var name = new List<string>();
             foreach (var assembly in testingSession.Mutants.Assembly)
             {
@@ -82,7 +121,7 @@ namespace VisualMutatorGUI
                             mutant.Description = fullName;
                             mutants.Add(mutant.Id, mutant);
                             if (mutant.State == "Live")
-                                liveMutants.Add(mutant.Id);
+                                liveMutants.Add(new MutantInfo(mutant.Id));
                         }
                         name.RemoveAt(name.Count - 1);
                     }
