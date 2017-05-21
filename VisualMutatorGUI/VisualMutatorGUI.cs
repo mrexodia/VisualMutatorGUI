@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace VisualMutatorGUI
 {
@@ -19,19 +20,24 @@ namespace VisualMutatorGUI
         {
             InitializeComponent();
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            listBoxMutants.SelectedIndexChanged += ListBoxMutants_SelectedIndexChanged;            
+            listBoxMutants.SelectedIndexChanged += ListBoxMutants_SelectedIndexChanged;
         }
 
         private void ListBoxMutants_SelectedIndexChanged(object sender, EventArgs e)
         {
-            richTextCode.Text = codeListings[liveMutants[listBoxMutants.SelectedIndex]];
+            var mutantId = liveMutants[listBoxMutants.SelectedIndex];
+            richTextCode.Text = mutants[mutantId].Description + ":\n" + codeListings[mutantId];
             for (var i = 0; i < richTextCode.Lines.Length; i++)
             {
                 var line = richTextCode.Lines[i];
-                if (Regex.Match(line, @" +\d+ +-").Success)
+                if(i == 0) //first line, full name for the mutated method
+                    richTextCode.HighlightLine(0, Color.LightGray);
+                else if (Regex.Match(line, @" +\d+ +\-").Success) //removed line
                     richTextCode.HighlightLine(i, Color.PaleVioletRed);
-                else if (Regex.Match(line, @" +\d+ +\+").Success)
+                else if (Regex.Match(line, @" +\d+ +\+").Success) //added line
                     richTextCode.HighlightLine(i, Color.GreenYellow);
+                else //any other line
+                    richTextCode.HighlightLine(i, Color.White);
             }
         }
 
@@ -58,16 +64,32 @@ namespace VisualMutatorGUI
             //Load mutants
             mutants = new Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant>();
             liveMutants = new List<string>();
+            var name = new List<string>();
             foreach (var assembly in testingSession.Mutants.Assembly)
-                if (assembly.Type != null)
-                    foreach (var type in assembly.Type)
-                        foreach (var method in type.Method)
-                            foreach (var mutant in method.Mutant)
-                            {
-                                mutants.Add(mutant.Id, mutant);
-                                if (mutant.State == "Live")
-                                    liveMutants.Add(mutant.Id);
-                            }
+            {
+                if (assembly.Type == null)
+                    continue;
+                name.Add(assembly.Name);
+                foreach (var type in assembly.Type)
+                {
+                    name.Add(type.Namespace + "." + type.Name);
+                    foreach (var method in type.Method)
+                    {
+                        name.Add(method.Name);
+                        var fullName = string.Join(".", name);
+                        foreach (var mutant in method.Mutant)
+                        {
+                            mutant.Description = fullName;
+                            mutants.Add(mutant.Id, mutant);
+                            if (mutant.State == "Live")
+                                liveMutants.Add(mutant.Id);
+                        }
+                        name.RemoveAt(name.Count - 1);
+                    }
+                    name.RemoveAt(name.Count - 1);
+                }
+                name.RemoveAt(name.Count - 1);
+            }
 
             //Load code listings
             codeListings = new Dictionary<string, string>();
