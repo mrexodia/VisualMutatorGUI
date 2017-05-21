@@ -2,6 +2,10 @@
 
 Simple GUI to visualize a results file from [VisualMutator](https://github.com/pavzaj/visualmutator/releases). The GUI will only show mutations that have the status `Live`. This tool was created because the graphical interface for VisualMutator built into Visual Studio is very unstable and it locks all your files to prevent you from editing. After you have saved the results you can use this tool without having VisualMutator open in Visual Studio.
 
+## Installation
+
+You can compile `VisualMutatorGUI.sln` with Visual Studio 2013 or later. For your convenience you can find signed binaries [here](https://github.com/mrexodia/VisualMutatorGUI/releases).
+
 ## Usage
 
 1. Open the VisualMutator dialog `View -> Other Windows -> VisualMutator`.
