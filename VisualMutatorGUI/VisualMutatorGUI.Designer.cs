@@ -32,6 +32,7 @@
             this.buttonLoadXml = new System.Windows.Forms.Button();
             this.richTextCode = new System.Windows.Forms.RichTextBox();
             this.linkIcon = new System.Windows.Forms.LinkLabel();
+            this.buttonStats = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listBoxMutants
@@ -44,7 +45,7 @@
             this.listBoxMutants.Location = new System.Drawing.Point(12, 41);
             this.listBoxMutants.Name = "listBoxMutants";
             this.listBoxMutants.Size = new System.Drawing.Size(1012, 114);
-            this.listBoxMutants.TabIndex = 2;
+            this.listBoxMutants.TabIndex = 3;
             // 
             // buttonLoadXml
             // 
@@ -67,26 +68,37 @@
             this.richTextCode.Name = "richTextCode";
             this.richTextCode.ReadOnly = true;
             this.richTextCode.Size = new System.Drawing.Size(1012, 387);
-            this.richTextCode.TabIndex = 3;
+            this.richTextCode.TabIndex = 4;
             this.richTextCode.Text = "";
             this.richTextCode.WordWrap = false;
             // 
             // linkIcon
             // 
             this.linkIcon.AutoSize = true;
-            this.linkIcon.Location = new System.Drawing.Point(140, 17);
+            this.linkIcon.Location = new System.Drawing.Point(221, 17);
             this.linkIcon.Name = "linkIcon";
             this.linkIcon.Size = new System.Drawing.Size(77, 13);
-            this.linkIcon.TabIndex = 1;
+            this.linkIcon.TabIndex = 2;
             this.linkIcon.TabStop = true;
             this.linkIcon.Text = "Icon by Icons8";
             this.linkIcon.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkIcon_LinkClicked);
+            // 
+            // buttonStats
+            // 
+            this.buttonStats.Location = new System.Drawing.Point(140, 12);
+            this.buttonStats.Name = "buttonStats";
+            this.buttonStats.Size = new System.Drawing.Size(75, 23);
+            this.buttonStats.TabIndex = 1;
+            this.buttonStats.Text = "Statistics...";
+            this.buttonStats.UseVisualStyleBackColor = true;
+            this.buttonStats.Click += new System.EventHandler(this.buttonStats_Click);
             // 
             // VisualMutatorGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1036, 564);
+            this.Controls.Add(this.buttonStats);
             this.Controls.Add(this.linkIcon);
             this.Controls.Add(this.richTextCode);
             this.Controls.Add(this.buttonLoadXml);
@@ -104,6 +116,7 @@
         private System.Windows.Forms.Button buttonLoadXml;
         private System.Windows.Forms.RichTextBox richTextCode;
         private System.Windows.Forms.LinkLabel linkIcon;
+        private System.Windows.Forms.Button buttonStats;
     }
 }
 

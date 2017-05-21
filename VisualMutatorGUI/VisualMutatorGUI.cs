@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Text;
 
 namespace VisualMutatorGUI
 {
@@ -15,6 +16,8 @@ namespace VisualMutatorGUI
         private Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant> mutants;
         private List<MutationTestingSessionMutantsAssemblyTypeMethodMutant> liveMutants;
         private Dictionary<string, string> codeListings;
+        private Dictionary<string, Tuple<int, int>> statistics;
+        private int totalKillRatio;
 
         public static Dictionary<string, string> MutationDescriptions;
 
@@ -104,6 +107,8 @@ namespace VisualMutatorGUI
             //Load mutants
             mutants = new Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant>();
             liveMutants = new List<MutationTestingSessionMutantsAssemblyTypeMethodMutant>();
+            statistics = new Dictionary<string, Tuple<int, int>>();
+            totalKillRatio = testingSession.MutationScore;
             var name = new List<string>();
             foreach (var assembly in testingSession.Mutants.Assembly)
             {
@@ -113,6 +118,8 @@ namespace VisualMutatorGUI
                 foreach (var type in assembly.Type)
                 {
                     name.Add(type.Namespace + "." + type.Name);
+                    var typeLive = 0;
+                    var typeDead = 0;
                     foreach (var method in type.Method)
                     {
                         name.Add(method.Name);
@@ -124,13 +131,17 @@ namespace VisualMutatorGUI
                             mutant.Description = fullName;
                             mutants.Add(mutant.Id, mutant);
                             if (mutant.State == "Live")
-                            { 
+                            {
+                                typeLive++;
                                 if (liveMutants.Count(m => m.Id == mutant.Id && m.Description == fullName) == 0)
                                     liveMutants.Add(mutant);
                             }
+                            else
+                                typeDead++;
                         }
                         name.RemoveAt(name.Count - 1);
                     }
+                    statistics.Add(string.Join(".", name), new Tuple<int, int>(typeLive, typeDead));
                     name.RemoveAt(name.Count - 1);
                 }
                 name.RemoveAt(name.Count - 1);
@@ -143,6 +154,29 @@ namespace VisualMutatorGUI
         private void linkIcon_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://icons8.com");
+        }
+
+        private void buttonStats_Click(object sender, EventArgs e)
+        {
+            if (statistics == null)
+                return;
+            var builder = new StringBuilder();
+            builder.AppendLine(@"\begin{tabular}{ |l|l| }");
+            builder.AppendLine(@"\hline");
+            builder.AppendLine(@"Class & Kill Ratio \\");
+            builder.AppendLine(@"\hline");
+            foreach (var p in statistics)
+            {
+                var live = p.Value.Item1;
+                var dead = p.Value.Item2;
+                var ratio = (float)dead / (float)(live + dead) * 100;
+                if (float.IsNaN(ratio))
+                    ratio = 100;
+                builder.AppendLine(string.Format(@"{0} & {1}\% \\", p.Key, (int)ratio));
+            }
+            builder.AppendLine(@"\hline");
+            builder.AppendLine(@"\end{tabular}");
+            MessageBox.Show(builder.ToString(), string.Format("Kill Ratio: {0} (Ctrl+C to copy)", totalKillRatio));
         }
     }
 }
