@@ -12,25 +12,11 @@ namespace VisualMutatorGUI
 {
     public partial class VisualMutatorGUI : Form
     {
-        private class MutantInfo
-        {
-            public readonly string Id;
-
-            public MutantInfo(string id)
-            {
-                Id = id;
-            }
-
-            public override string ToString()
-            {
-                return string.Format("{0} ({1})", Id, mutd[Id.Split('#')[0]]);
-            }
-        }
-
         private Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant> mutants;
-        private List<MutantInfo> liveMutants;
+        private List<MutationTestingSessionMutantsAssemblyTypeMethodMutant> liveMutants;
         private Dictionary<string, string> codeListings;
-        private static Dictionary<string, string> mutd;
+
+        public static Dictionary<string, string> MutationDescriptions;
 
         public VisualMutatorGUI()
         {
@@ -38,7 +24,7 @@ namespace VisualMutatorGUI
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             listBoxMutants.SelectedIndexChanged += ListBoxMutants_SelectedIndexChanged;
 
-            mutd = new Dictionary<string, string>
+            MutationDescriptions = new Dictionary<string, string>
             {
                 { "DEH", "Method delegated for event handling change" },
                 { "DMC", "Delegated method change" },
@@ -69,7 +55,7 @@ namespace VisualMutatorGUI
             for (var i = 0; i < richTextCode.Lines.Length; i++)
             {
                 var line = richTextCode.Lines[i];
-                if(i == 0) //first line, full name for the mutated method
+                if (i == 0) //first line, full name for the mutated method
                     richTextCode.HighlightLine(0, Color.LightGray);
                 else if (Regex.Match(line, @" +\d+ +\-").Success) //removed line
                     richTextCode.HighlightLine(i, Color.PaleVioletRed);
@@ -100,9 +86,18 @@ namespace VisualMutatorGUI
                 testingSession = (MutationTestingSession)serializer.Deserialize(reader);
             }
 
+            //Load code listings
+            codeListings = new Dictionary<string, string>();
+            foreach (var listing in testingSession.CodeDifferenceListings)
+            {
+                var trimmedCode = listing.Code.Trim('\r', '\n');
+                if (trimmedCode.Length > 0)
+                    codeListings.Add(listing.MutantId, trimmedCode);
+            }
+
             //Load mutants
             mutants = new Dictionary<string, MutationTestingSessionMutantsAssemblyTypeMethodMutant>();
-            liveMutants = new List<MutantInfo>();
+            liveMutants = new List<MutationTestingSessionMutantsAssemblyTypeMethodMutant>();
             var name = new List<string>();
             foreach (var assembly in testingSession.Mutants.Assembly)
             {
@@ -118,10 +113,12 @@ namespace VisualMutatorGUI
                         var fullName = string.Join(".", name);
                         foreach (var mutant in method.Mutant)
                         {
+                            if (!codeListings.ContainsKey(mutant.Id))
+                                continue;
                             mutant.Description = fullName;
                             mutants.Add(mutant.Id, mutant);
                             if (mutant.State == "Live")
-                                liveMutants.Add(new MutantInfo(mutant.Id));
+                                liveMutants.Add(mutant);
                         }
                         name.RemoveAt(name.Count - 1);
                     }
@@ -129,11 +126,6 @@ namespace VisualMutatorGUI
                 }
                 name.RemoveAt(name.Count - 1);
             }
-
-            //Load code listings
-            codeListings = new Dictionary<string, string>();
-            foreach (var listing in testingSession.CodeDifferenceListings)
-                codeListings.Add(listing.MutantId, listing.Code.Trim('\r', '\n'));
 
             //Update listbox with live mutants
             listBoxMutants.DataSource = liveMutants;
@@ -143,5 +135,13 @@ namespace VisualMutatorGUI
         {
             System.Diagnostics.Process.Start("https://icons8.com");
         }
+    }
+}
+
+public partial class MutationTestingSessionMutantsAssemblyTypeMethodMutant
+{
+    public override string ToString()
+    {
+        return string.Format("{0} -> {1} ({2})", Description, Id, VisualMutatorGUI.VisualMutatorGUI.MutationDescriptions[Id.Split('#')[0]]);
     }
 }

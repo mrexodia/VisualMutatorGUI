@@ -38,7 +38,9 @@
             // 
             this.listBoxMutants.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxMutants.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxMutants.FormattingEnabled = true;
+            this.listBoxMutants.ItemHeight = 11;
             this.listBoxMutants.Location = new System.Drawing.Point(12, 41);
             this.listBoxMutants.Name = "listBoxMutants";
             this.listBoxMutants.Size = new System.Drawing.Size(1012, 121);
